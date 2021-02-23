@@ -8,8 +8,13 @@ on:
       - 'develop'
       - 'master'
   pull_request:
+    types:
+      - opened
+      - reopened
+      - ready_for_review
     branches:
       - 'develop'
+      - 'master'
 
 # List of jobs
 jobs:
