@@ -63,6 +63,7 @@ jobs:
           aws s3 cp s3://${{ env.STORYBOOK_S3_BUCKET }}/${{ env.WORKING_BRANCH }}/ s3://${{ env.STORYBOOK_S3_BUCKET }}/${{ env.WORKING_BRANCH }}/ --exclude "*" --include "*.html" \
             --recursive --metadata-directive REPLACE --cache-control no-cache
         env:
+          STORYBOOK_S3_BUCKET: frontend-storybook-bucket
           WORKING_BRANCH: ${{ steps.extract_branch.outputs.branch }}
       # End of deploy storybook to AWS S3 bucket as a static website
       - name: Publish to Chromatic
