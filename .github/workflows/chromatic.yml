@@ -53,7 +53,7 @@ jobs:
           aws-region: ap-northeast-1
       - name: Extract branch name
         shell: bash
-        run: run: echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
+        run: echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
         id: extract_branch
       - name: Copy files to the test website with the AWS CLI
         if: extract_branch == develop
