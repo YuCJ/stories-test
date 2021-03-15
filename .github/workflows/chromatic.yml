@@ -26,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 2 # Codecov needs fetch-depth > 1 to get commit SHA
+          fetch-depth: 0
       # `action/setup-node@v2` will create an .npmrc file referencing $NODE_AUTH_TOKEN
       # So we can set $NODE_AUTH_TOKEN with right permission when we publish or install npm packages
       - uses: actions/setup-node@v2
@@ -44,6 +44,22 @@ jobs:
         run: yarn --frozen-lockfile
       - name: Build Storybook
         run: yarn build-storybook
+      # Start of push storybook to AWS
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
+        id: extract_branch
+      - name: Copy files to the test website with the AWS CLI
+        if: steps.extract_branch.outputs.branch == 'develop'
+        run: |
+          aws s3 sync ./storybook-static s3://frontend-storybook-bucket/develop/
+      # End of push storybook to AWS
       - name: Publish to Chromatic
         uses: chromaui/action@v1
         # Chromatic GitHub Action options
