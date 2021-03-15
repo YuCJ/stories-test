@@ -51,4 +51,4 @@ jobs:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           autoAcceptChanges: master|develop
           exitZeroOnChanges: true
-          buildScriptName: build-storybook
+          storybookBuildDir: storybook-static
