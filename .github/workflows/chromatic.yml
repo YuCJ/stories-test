@@ -42,6 +42,8 @@ jobs:
           key: ${{ steps.get-runner-env-version.outputs.os }}-node${{ steps.get-runner-env-version.outputs.node }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: Install packages without updating lock file
         run: yarn --frozen-lockfile
+      - name: Build Storybook
+        run: yarn build-storybook
       - name: Publish to Chromatic
         uses: chromaui/action@v1
         # Chromatic GitHub Action options
