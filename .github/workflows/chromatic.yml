@@ -22,6 +22,8 @@ jobs:
   chromatic-deployment:
     # Operating System
     runs-on: ubuntu-latest
+    env:
+      STORYBOOK_S3_BUCKET: frontend-storybook-bucket
     # Job steps
     steps:
       - uses: actions/checkout@v2
@@ -44,23 +46,24 @@ jobs:
         run: yarn --frozen-lockfile
       - name: Build Storybook
         run: yarn build-storybook
-      # Start of push storybook to AWS
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-1
-      - name: Extract branch name
-        id: extract_branch
-        run: echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
+      # Start of deploy storybook to AWS S3 bucket as a static website
       - name: Copy files to the test website with the AWS CLI
         if: env.current_branch == 'develop' || env.current_branch == 'master'
         run: |
-          aws s3 sync ./storybook-static s3://frontend-storybook-bucket/${{ env.current_branch }} --cache-control "public, max-age=604800" --delete
+          aws s3 sync ./storybook-static s3://${{ env.STORYBOOK_S3_BUCKET }}/${{ env.current_branch }} --delete
         env:
           current_branch: ${{ steps.extract_branch.outputs.branch }}
-      # End of push storybook to AWS
+      - name: Cache JavaScript bundles for 30 days
+        if: env.current_branch == 'develop' || env.current_branch == 'master'
+        run: |
+          aws s3 cp s3://${{ env.STORYBOOK_S3_BUCKET }}/ s3://${{ env.STORYBOOK_S3_BUCKET }}/ --exclude "*" --include "*.js.map" --include "*.js" \
+            --recursive --metadata-directive REPLACE --cache-control "public,max-age=2592000,immutable"
+      - name: Do not cache HTML files
+        if: env.current_branch == 'develop' || env.current_branch == 'master'
+        run: |
+          aws s3 cp s3://${{ env.STORYBOOK_S3_BUCKET }}/ s3://${{ env.STORYBOOK_S3_BUCKET }}/ --exclude "*" --include "*.html" \
+            --recursive --metadata-directive REPLACE --cache-control no-cache
+      # End of deploy storybook to AWS S3 bucket as a static website
       - name: Publish to Chromatic
         uses: chromaui/action@v1
         # Chromatic GitHub Action options
