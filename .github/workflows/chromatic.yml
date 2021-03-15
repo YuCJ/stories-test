@@ -38,4 +38,3 @@ jobs:
           autoAcceptChanges: master|develop
           exitZeroOnChanges: true
           buildScriptName: build-storybook
-          storybookBuildDir: storybook-static
