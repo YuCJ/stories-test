@@ -33,8 +33,6 @@ jobs:
         with:
           node-version: '12.x'
           registry-url: 'https://registry.npmjs.org'
-      - name: Validate config files
-        run: yarn validate:codecov
       - uses: './.github/actions/get_runner_env_version'
         id: get-runner-env-version
       - uses: actions/cache@v2
