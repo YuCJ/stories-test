@@ -20,7 +20,6 @@ on:
 # List of jobs
 jobs:
   chromatic-deployment:
-    if: ${{ github.event.label.name != 'no storybook' }}
     # Operating System
     runs-on: ubuntu-latest
     # Job steps
@@ -53,5 +52,6 @@ jobs:
           # 👇 Chromatic projectToken, refer to the manage page to obtain it.
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           autoAcceptChanges: master|develop
+          skip: nostorybook/*
           exitZeroOnChanges: true
           storybookBuildDir: storybook-static
