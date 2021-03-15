@@ -46,7 +46,7 @@ jobs:
         run: yarn build-storybook
       # Start of deploy storybook to AWS S3 bucket as a static website
       - name: Sync files to the test website with the AWS CLI
-        if: env.working_branch == 'develop' || env.working_branch == 'master'
+        if: env.WORKING_BRANCH == 'develop' || env.WORKING_BRANCH == 'master'
         run: |
           aws s3 sync ./storybook-static s3://${{ env.STORYBOOK_S3_BUCKET }}/${{ env.WORKING_BRANCH }}/ --delete && \
           aws s3 cp s3://${{ env.STORYBOOK_S3_BUCKET }}/${{ env.WORKING_BRANCH }}/ s3://${{ env.STORYBOOK_S3_BUCKET }}/${{ env.WORKING_BRANCH }}/ --exclude "*" --include "*.js.map" --include "*.js" \
