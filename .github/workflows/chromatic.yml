@@ -52,5 +52,6 @@ jobs:
           # 👇 Chromatic projectToken, refer to the manage page to obtain it.
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           autoAcceptChanges: master|develop
+          skip: nostorybook/**
           exitZeroOnChanges: true
           storybookBuildDir: storybook-static
