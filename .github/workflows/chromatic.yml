@@ -24,10 +24,26 @@ jobs:
     runs-on: ubuntu-latest
     # Job steps
     steps:
-      - uses: actions/checkout@v1
-      - name: Install dependencies
-        run: yarn
-        # 👇 Adds Chromatic as a step in the workflow
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2 # Codecov needs fetch-depth > 1 to get commit SHA
+      # `action/setup-node@v2` will create an .npmrc file referencing $NODE_AUTH_TOKEN
+      # So we can set $NODE_AUTH_TOKEN with right permission when we publish or install npm packages
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12.x'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Validate config files
+        run: yarn validate:codecov
+      - uses: './.github/actions/get_runner_env_version'
+        id: get-runner-env-version
+      - uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: node_modules/
+          key: ${{ steps.get-runner-env-version.outputs.os }}-node${{ steps.get-runner-env-version.outputs.node }}-yarn-${{ hashFiles('yarn.lock') }}
+      - name: Install packages without updating lock file
+        run: yarn --frozen-lockfile
       - name: Publish to Chromatic
         uses: chromaui/action@v1
         # Chromatic GitHub Action options
