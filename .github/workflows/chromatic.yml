@@ -44,28 +44,28 @@ jobs:
         run: yarn --frozen-lockfile
       - name: Build Storybook
         run: yarn build-storybook -- --quiet
-      # Start of deploy storybook to AWS S3 bucket as a static website
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-1
-      - name: Extract branch name to steps output
-        id: extract_branch
-        run: echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
-      - name: Sync files to the test website with the AWS CLI
-        if: env.WORKING_BRANCH == 'develop' || env.WORKING_BRANCH == 'master'
-        run: |
-          aws s3 sync ./storybook-static s3://${{ env.STORYBOOK_S3_BUCKET }}/${{ env.WORKING_BRANCH }}/ --delete && \
-          aws s3 cp s3://${{ env.STORYBOOK_S3_BUCKET }}/${{ env.WORKING_BRANCH }}/ s3://${{ env.STORYBOOK_S3_BUCKET }}/${{ env.WORKING_BRANCH }}/ --exclude "*" --include "*.js.map" --include "*.js" \
-            --recursive --metadata-directive REPLACE --cache-control "public,max-age=2592000,immutable" && \
-          aws s3 cp s3://${{ env.STORYBOOK_S3_BUCKET }}/${{ env.WORKING_BRANCH }}/ s3://${{ env.STORYBOOK_S3_BUCKET }}/${{ env.WORKING_BRANCH }}/ --exclude "*" --include "*.html" \
-            --recursive --metadata-directive REPLACE --cache-control no-cache
-        env:
-          STORYBOOK_S3_BUCKET: frontend-storybook-bucket
-          WORKING_BRANCH: ${{ steps.extract_branch.outputs.branch }}
-      # End of deploy storybook to AWS S3 bucket as a static website
+#       # Start of deploy storybook to AWS S3 bucket as a static website
+#       - name: Configure AWS Credentials
+#         uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ap-northeast-1
+#       - name: Extract branch name to steps output
+#         id: extract_branch
+#         run: echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
+#       - name: Sync files to the test website with the AWS CLI
+#         if: env.WORKING_BRANCH == 'develop' || env.WORKING_BRANCH == 'master'
+#         run: |
+#           aws s3 sync ./storybook-static s3://${{ env.STORYBOOK_S3_BUCKET }}/${{ env.WORKING_BRANCH }}/ --delete && \
+#           aws s3 cp s3://${{ env.STORYBOOK_S3_BUCKET }}/${{ env.WORKING_BRANCH }}/ s3://${{ env.STORYBOOK_S3_BUCKET }}/${{ env.WORKING_BRANCH }}/ --exclude "*" --include "*.js.map" --include "*.js" \
+#             --recursive --metadata-directive REPLACE --cache-control "public,max-age=2592000,immutable" && \
+#           aws s3 cp s3://${{ env.STORYBOOK_S3_BUCKET }}/${{ env.WORKING_BRANCH }}/ s3://${{ env.STORYBOOK_S3_BUCKET }}/${{ env.WORKING_BRANCH }}/ --exclude "*" --include "*.html" \
+#             --recursive --metadata-directive REPLACE --cache-control no-cache
+#         env:
+#           STORYBOOK_S3_BUCKET: frontend-storybook-bucket
+#           WORKING_BRANCH: ${{ steps.extract_branch.outputs.branch }}
+#       # End of deploy storybook to AWS S3 bucket as a static website
       - name: Publish to Chromatic
         uses: chromaui/action@v1
         # Chromatic GitHub Action options
