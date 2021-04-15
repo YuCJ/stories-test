@@ -1,0 +1,23 @@
+# Workflow name
+name: 'try to retrieve env in different steps'
+
+# Event for the workflow
+on:
+  push:
+    branches:
+      - 'test/*'
+
+# List of jobs
+jobs:
+  test:
+    # Operating System
+    runs-on: ubuntu-latest
+    # Job steps
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get Env here
+        run: echo $TESTING_ENV_VAR
+        env:
+          TESTING_ENV_VAR: ${{ secrets.TESTING_ENV_VAR }}
+      - name: Try to get env in above step
+        run: echo $TESTING_ENV_VAR
