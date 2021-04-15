@@ -16,8 +16,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Get Env here
-        run: echo $TESTING_ENV_VAR
+        run: echo "$TESTING_ENV_VAR"
         env:
           TESTING_ENV_VAR: ${{ secrets.TESTING_ENV_VAR }}
       - name: Try to get env in above step
-        run: echo $TESTING_ENV_VAR
+        run: echo "$TESTING_ENV_VAR"
